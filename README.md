@@ -134,3 +134,4 @@ in the deployment manifests to point at your registry.
   CI/CD/container/Kubernetes mechanics without extra infrastructure to stand up first.
 # real-estate-company
 This project uses Docker, Kubernetes, and AWS.
+This project demonstrates a CI/CD pipeline with GitHub Actions, Docker, Trivy security scanning, and automated deployment.
