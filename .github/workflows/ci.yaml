@@ -1,3 +1,4 @@
+
 name: Real Estate Company CI/CD
 
 on:
@@ -123,8 +124,8 @@ jobs:
       - backend
       - security
 
-    # Only publish after code reaches main.
-    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/feature-estate')
+    # Publish only after merging/pushing to main
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     permissions:
       contents: read
@@ -154,6 +155,22 @@ jobs:
             exit 1
           fi
           echo "AWS_ROLE_ARN variable is configured"
+
+      # ======================================
+      # DEBUG OIDC TOKEN CLAIMS
+      # ======================================
+      - name: Debug GitHub OIDC claims
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const token = await core.getIDToken('sts.amazonaws.com');
+            const payload = JSON.parse(
+              Buffer.from(token.split('.')[1], 'base64url').toString()
+            );
+            core.info(`OIDC subject: ${payload.sub}`);
+            core.info(`OIDC audience: ${payload.aud}`);
+            core.info(`Repository: ${payload.repository}`);
+            core.info(`Ref: ${payload.ref}`);
 
       # ======================================
       # AWS AUTHENTICATION USING OIDC
@@ -219,3 +236,4 @@ jobs:
 
           echo "Backend image:"
           echo "${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_BACKEND }}:${{ github.sha }}"
+
